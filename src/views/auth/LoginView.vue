@@ -56,10 +56,15 @@
 <script setup lang="ts">
 import { useField, useForm } from "vee-validate"
 import loginSchema from "../../validations/loginSchema";
+import { useFirebaseAuth } from "vuefire";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth"
 
+const auth = useFirebaseAuth();
 const { handleSubmit } = useForm({
     validationSchema:loginSchema
 });
+
+console.log(auth)
 
 const email = useField<string>('email');
 const password = useField<string>('password');
