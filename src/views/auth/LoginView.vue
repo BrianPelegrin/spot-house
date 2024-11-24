@@ -14,13 +14,22 @@
         <v-card-text>
             <v-form @submit.prevent="submit">
                 <v-container>
+                    <v-alert 
+                        v-if="auth.errorMessage" 
+                        :text="auth.errorMessage" 
+                        type="error" 
+                        closable 
+                        variant="tonal" 
+                        class="mb-4" 
+                    />
                     <v-text-field
                         v-model="email.value.value"
                         :error-messages="email.errorMessage.value"
                         :loading="false"                          
                         label="Correo Electronico"
                         variant="outlined" 
-                        type="email"                         
+                        type="email"
+                        class="mb-2"
                     />
                     <v-text-field
                         v-model="password.value.value"
@@ -28,25 +37,31 @@
                         :loading="false"                         
                         label="Contraseña" 
                         variant="outlined" 
-                        type="password"                         
+                        type="password"
+                        class="mb-2"
                     />
-                    <v-btn
-                        type="submit"
-                        class="bg-brown-lighten-3 text-white w-100 mb-4"
-                    >
-                        Iniciar Sesion
-                        <template v-slot:loader>
-                            <span class="mx-2">Iniciando Sesion </span>
-                            <v-progress-circular :size="20"
-                                indeterminate
-                            ></v-progress-circular>
-                        </template>
-                    </v-btn>
-                    <v-btn
-                        class="bg-brown-lighten-3 text-white w-100"
-                    >
-                        Registrate
-                    </v-btn>
+                    <v-row>
+                        <v-col>
+                            <v-btn
+                                type="submit"
+                                class="bg-brown-lighten-3 text-white w-100 mb-4"
+                            >
+                                Iniciar Sesion
+                                <template v-slot:loader>
+                                    <span class="mx-2">Iniciando Sesion </span>
+                                    <v-progress-circular :size="20"
+                                        indeterminate
+                                    ></v-progress-circular>
+                                </template>
+                            </v-btn>
+                        </v-col>
+                        <v-col>
+                            <v-btn class="bg-brown-lighten-3 text-white w-100">
+                                Registrate
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    
                 </v-container>
             </v-form>
         </v-card-text>        
@@ -56,21 +71,20 @@
 <script setup lang="ts">
 import { useField, useForm } from "vee-validate"
 import loginSchema from "../../validations/loginSchema";
-import { useFirebaseAuth } from "vuefire";
-import { signInWithEmailAndPassword, getAuth } from "firebase/auth"
+import { IAuthCredentials } from "../../interfaces/authentication";
+import authStore from "../../stores/auth";
 
-const auth = useFirebaseAuth();
-const { handleSubmit } = useForm({
+const auth = authStore();
+const { handleSubmit } = useForm<IAuthCredentials>({
     validationSchema:loginSchema
 });
-
-console.log(auth)
 
 const email = useField<string>('email');
 const password = useField<string>('password');
 
-const submit = handleSubmit(values => {
-    console.log('LoginForm: ', values)
+const submit = handleSubmit((values) => {
+    auth.login(values);
+    console.log(values)
 })
 
 </script>
